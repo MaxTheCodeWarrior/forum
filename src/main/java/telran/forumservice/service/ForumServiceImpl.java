@@ -14,7 +14,7 @@ import telran.forumservice.dto.PeriodDto;
 import telran.forumservice.dto.PostCreateDto;
 import telran.forumservice.dto.PostDto;
 import telran.forumservice.dto.PostUpdateDto;
-import telran.forumservice.dto.exceptions.PostNotFoundException;
+import telran.forumservice.exceptions.PostNotFoundException;
 import telran.forumservice.model.Comment;
 import telran.forumservice.model.Post;
 
@@ -72,7 +72,6 @@ public class ForumServiceImpl implements ForumService {
 	public PostDto deletePost(String id) {
 		Post post = forumRepository.findById(id).orElseThrow(PostNotFoundException::new);
 		forumRepository.delete(post);
-
 		return modelMapper.map(post, PostDto.class);
 	}
 
@@ -94,7 +93,8 @@ public class ForumServiceImpl implements ForumService {
 		Post post = forumRepository.findById(id).orElseThrow(PostNotFoundException::new);
 		post.setContent(postUpdateDto.getContent());
 		post.setTitle(postUpdateDto.getTitle());
-		post.setTags(postUpdateDto.getTags());
+//		post.setTags(postUpdateDto.getTags());
+		post.getTags().addAll(postUpdateDto.getTags());
 		forumRepository.save(post);
 		return modelMapper.map(post, PostDto.class);
 	}
