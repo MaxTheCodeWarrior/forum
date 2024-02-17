@@ -1,1 +1,1 @@
-Acoounting base was addet
+Acoounting base was implemented 
