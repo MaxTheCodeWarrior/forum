@@ -39,14 +39,14 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public UserDto deleteUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		accountRepository.delete(user);
 		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public UserDto updateUser(String login, UserUpdateDto userUppdateDto) {
-		User user = accountRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.setFirstName(userUppdateDto.getFirstName());
 		user.setLastName(userUppdateDto.getLastName());
 		accountRepository.save(user);
@@ -55,7 +55,7 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public UserRolesDto addUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().add(role);
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -63,7 +63,7 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public UserRolesDto deleteUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().remove(role);
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -71,7 +71,9 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public void changeUserPassword(String login, String newPassword) {
-		// TODO
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
+		user.setPassword(newPassword);
+		accountRepository.save(user);
 	}
 
 	@Override
@@ -83,7 +85,7 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public UserDto getUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user, UserDto.class);
 	}
 

@@ -1,7 +1,6 @@
 package telran.forumservice.accounting.controller;
 
 import java.security.Principal;
-import java.util.Base64;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -43,11 +42,6 @@ public class AccountingController {
 
 	@PostMapping("/login")
 	public ResponseEntity<UserDto> loginUser(Principal principal) {
-//		token = token.split(" ")[1];
-//		String credentials = new String(Base64.getDecoder().decode(token));
-
-		// TODO Not implemented loginUser() method
-		// credentials.split(":")[0])
 		return ResponseEntity.status(HttpStatus.OK).body(accountingService.getUser(principal.getName()));
 	}
 
