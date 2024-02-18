@@ -1,5 +1,6 @@
 package telran.forumservice.accounting.service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,10 @@ public class AccountingServiceImpl implements AccountingService {
 	@Override
 	public UserDto registerUser(UserCreateDto userCreateDto) {
 		UserDto userDto = modelMapper.map(userCreateDto, UserDto.class);
-		userDto.getRoles().add("USER");
+		userDto.getRoles().add("USER"); 
+		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
 		User user = modelMapper.map(userDto, User.class);
+		user.setPassword(password);
 		accountRepository.save(user);
 		return userDto;
 	}
@@ -67,7 +70,7 @@ public class AccountingServiceImpl implements AccountingService {
 	}
 
 	@Override
-	public void changeUserPassword() {
+	public void changeUserPassword(String login, String newPassword) {
 		// TODO
 	}
 

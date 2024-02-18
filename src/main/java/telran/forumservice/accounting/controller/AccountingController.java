@@ -1,5 +1,8 @@
 package telran.forumservice.accounting.controller;
 
+import java.security.Principal;
+import java.util.Base64;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -38,9 +42,13 @@ public class AccountingController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<UserDto> loginUser() {
+	public ResponseEntity<UserDto> loginUser(Principal principal) {
+//		token = token.split(" ")[1];
+//		String credentials = new String(Base64.getDecoder().decode(token));
+
 		// TODO Not implemented loginUser() method
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+		// credentials.split(":")[0])
+		return ResponseEntity.status(HttpStatus.OK).body(accountingService.getUser(principal.getName()));
 	}
 
 	@DeleteMapping("/user/{user}")
@@ -71,10 +79,9 @@ public class AccountingController {
 	}
 
 	@PutMapping("/password")
-	public ResponseEntity<Void> changeUserPassword() {
-		// TODO implemented changeUserPassword() method
-		accountingService.changeUserPassword();
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+	public ResponseEntity<Void> changeUserPassword(Principal principal, @RequestHeader("X-Password") String newPassword) {
+		accountingService.changeUserPassword(principal.getName(), newPassword);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
 
