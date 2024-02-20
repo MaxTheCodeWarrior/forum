@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.Base64;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.Filter;
@@ -30,7 +31,7 @@ public class AuthenticationFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 
-		if (request.getHeader("Authorization") != null) {
+		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 			try {
 				String[] credentials = getCredentials(request.getHeader("Authorization"));
 				User user = accountingRepository.findById(credentials[0])
@@ -48,6 +49,17 @@ public class AuthenticationFilter implements Filter {
 		chain.doFilter(request, response);
 
 	}
+	
+	
+	private boolean checkEndPoint(String method, String path) {
+	    boolean isNotAuthorizedPost = !HttpMethod.POST.matches(method) &&
+	            (path.equals("/account/register") || path.equals("/posts/tags") || path.equals("/posts/period"));
+
+	    boolean isNotAuthorizedGet = !(HttpMethod.GET.matches(method) && path.startsWith("/posts/author/"));
+
+	    return !(isNotAuthorizedPost || isNotAuthorizedGet);
+	}
+
 	
 	private String[] getCredentials(String header) {
 		String token = header.split(" ")[1];
