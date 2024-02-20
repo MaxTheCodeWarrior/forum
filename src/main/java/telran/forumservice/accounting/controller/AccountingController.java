@@ -31,14 +31,11 @@ public class AccountingController {
 	final ModelMapper modelMapper;
 
 	@PostMapping("/register")
-	public ResponseEntity<UserDto> registerUser(@RequestBody UserCreateDto userCreateDto) {
-		if (accountingService.getUserOrElseNull(userCreateDto.getLogin()) == null) {
-			UserDto userDto = accountingService.registerUser(userCreateDto);
-			accountingService.registerUser(userCreateDto);
-			return ResponseEntity.status(HttpStatus.OK).body(userDto);
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	public ResponseEntity<UserDto> register(@RequestBody UserCreateDto userCreateDto) {
+		UserDto userDto = accountingService.registerUser(userCreateDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userDto);
 	}
+
 
 	@PostMapping("/login")
 	public ResponseEntity<UserDto> loginUser(Principal principal) {
@@ -48,32 +45,31 @@ public class AccountingController {
 	@DeleteMapping("/user/{user}")
 	public ResponseEntity<UserDto> deleteUser(@PathVariable String user) {
 		UserDto userDto = accountingService.deleteUser(user);
-		return ResponseEntity.status(userDto != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).body(userDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userDto);
 	}
 
 	@PutMapping("/user/{user}")
 	public ResponseEntity<UserDto> updateUser(@PathVariable String user, @RequestBody UserUpdateDto userUppdateDto) {
 		UserDto userDto = accountingService.updateUser(user, userUppdateDto);
-		return ResponseEntity.status(userDto != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).body(userDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userDto);
 	}
 
 	@PutMapping("/user/{user}/role/{role}")
 	public ResponseEntity<UserRolesDto> addUserRole(@PathVariable String user, @PathVariable String role) {
 		UserRolesDto userRolesDto = accountingService.addUserRole(user, role);
-		return ResponseEntity.status(userRolesDto != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(userRolesDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userRolesDto);
 
 	}
 
 	@DeleteMapping("/user/{user}/role/{role}")
 	public ResponseEntity<UserRolesDto> deleteUserRole(@PathVariable String user, @PathVariable String role) {
 		UserRolesDto userRolesDto = accountingService.deleteUserRole(user, role);
-		return ResponseEntity.status(userRolesDto != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(userRolesDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userRolesDto);
 	}
 
 	@PutMapping("/password")
-	public ResponseEntity<Void> changeUserPassword(Principal principal, @RequestHeader("X-Password") String newPassword) {
+	public ResponseEntity<Void> changeUserPassword(Principal principal,
+			@RequestHeader("X-Password") String newPassword) {
 		accountingService.changeUserPassword(principal.getName(), newPassword);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -82,7 +78,7 @@ public class AccountingController {
 	@GetMapping("/user/{user}")
 	public ResponseEntity<UserDto> getUser(@PathVariable String user) {
 		UserDto userDto = modelMapper.map(accountingService.getUser(user), UserDto.class);
-		return ResponseEntity.status(userDto != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).body(userDto);
+		return ResponseEntity.status(HttpStatus.OK).body(userDto);
 
 	}
 

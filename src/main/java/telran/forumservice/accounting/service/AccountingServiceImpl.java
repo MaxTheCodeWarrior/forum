@@ -11,6 +11,7 @@ import telran.forumservice.accounting.dto.UserDto;
 import telran.forumservice.accounting.dto.UserRolesDto;
 import telran.forumservice.accounting.dto.UserUpdateDto;
 import telran.forumservice.accounting.model.User;
+import telran.forumservice.exceptions.UserExistsException;
 import telran.forumservice.exceptions.UserNotFoundException;
 
 @Service
@@ -22,19 +23,15 @@ public class AccountingServiceImpl implements AccountingService {
 
 	@Override
 	public UserDto registerUser(UserCreateDto userCreateDto) {
-		UserDto userDto = modelMapper.map(userCreateDto, UserDto.class);
-		userDto.getRoles().add("USER"); 
+		if (accountRepository.existsById(userCreateDto.getLogin())) {
+			throw new UserExistsException();
+		}
+		User user = modelMapper.map(userCreateDto, User.class);
 		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
-		User user = modelMapper.map(userDto, User.class);
 		user.setPassword(password);
+		user.getRoles().add("USER");
 		accountRepository.save(user);
-		return userDto;
-	}
-
-	@Override
-	public UserDto loginUser() {
-		// TODO Auto-generated method stub
-		return null;
+		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
@@ -72,15 +69,9 @@ public class AccountingServiceImpl implements AccountingService {
 	@Override
 	public void changeUserPassword(String login, String newPassword) {
 		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
-		user.setPassword(newPassword);
+		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+		user.setPassword(password);
 		accountRepository.save(user);
-	}
-
-	@Override
-	public UserDto getUserOrElseNull(String login) {
-		User user = accountRepository.findByLogin(login).orElse(null);
-		return user != null ? modelMapper.map(user, UserDto.class) : null;
-
 	}
 
 	@Override

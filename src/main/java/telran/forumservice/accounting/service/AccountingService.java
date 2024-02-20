@@ -9,20 +9,17 @@ public interface AccountingService {
 
 	UserDto registerUser(UserCreateDto userCreateDto); 
 
-	UserDto loginUser(); // TODO
+	UserDto deleteUser(String login);
 
-	UserDto deleteUser(String user);
+	UserDto updateUser(String login, UserUpdateDto userUppdateDto);
 
-	UserDto updateUser(String user, UserUpdateDto userUppdateDto);
+	UserRolesDto addUserRole(String login, String role);
 
-	UserRolesDto addUserRole(String user, String role);
-
-	UserRolesDto deleteUserRole(String user, String role);
+	UserRolesDto deleteUserRole(String login, String role);
 
 	void changeUserPassword(String login, String newPassword);
 
-	UserDto getUser(String user);
+	UserDto getUser(String login);
 
-	UserDto getUserOrElseNull(String login);
 
 }
