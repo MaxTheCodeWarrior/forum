@@ -52,12 +52,10 @@ public class AuthenticationFilter implements Filter {
 	
 	
 	private boolean checkEndPoint(String method, String path) {
-	    boolean isNotAuthorizedPost = !HttpMethod.POST.matches(method) &&
-	            (path.equals("/account/register") || path.equals("/posts/tags") || path.equals("/posts/period"));
-
-	    boolean isNotAuthorizedGet = !(HttpMethod.GET.matches(method) && path.startsWith("/posts/author/"));
-
-	    return !(isNotAuthorizedPost || isNotAuthorizedGet);
+	   return !(
+			   (HttpMethod.POST.matches(method) &&
+	            path.equals("/account/register")) ||  path.contains("/posts")
+	            		);
 	}
 
 	
