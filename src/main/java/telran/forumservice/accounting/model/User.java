@@ -11,16 +11,17 @@ import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
+@Setter
 public class User {
 
 	@Id
 	String login;
-	@Setter
+
 	private String password;
-	@Setter
+
 	String firstName;
-	@Setter
+
 	String lastName;
-	@Setter
+
 	Set<String> roles = new HashSet<>();
 }

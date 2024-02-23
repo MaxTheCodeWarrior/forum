@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.Base64;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import telran.forumservice.accounting.model.User;
 
 @RequiredArgsConstructor
 @Component
+@Order(10)
 public class AuthenticationFilter implements Filter {
 
 	final AccountingRepository accountingRepository;
@@ -54,7 +56,7 @@ public class AuthenticationFilter implements Filter {
 	private boolean checkEndPoint(String method, String path) {
 	   return !(
 			   (HttpMethod.POST.matches(method) &&
-	            path.equals("/account/register")) ||  path.contains("/posts")
+	            path.equals("/account/register")) ||  path.startsWith("/forum/posts")
 	            		);
 	}
 

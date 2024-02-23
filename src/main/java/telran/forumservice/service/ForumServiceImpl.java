@@ -50,7 +50,8 @@ public class ForumServiceImpl implements ForumService {
 
 	@Override
 	public List<PostDto> findPostsByAuthor(String author) {
-		return forumRepository.findPostsByAuthor(author).map(p -> modelMapper.map(p, PostDto.class)).toList();
+		return forumRepository.findPostsByAuthor(author)
+					.map(p -> modelMapper.map(p, PostDto.class)).toList();
 	}
 
 	@Override
@@ -62,9 +63,7 @@ public class ForumServiceImpl implements ForumService {
 			newComment.setMessage(commentDto.getMessage());
 		}
 		newComment.setUser(user);
-
 		post.addComment(newComment);
-
 		return modelMapper.map(post, PostDto.class);
 	}
 
@@ -91,11 +90,10 @@ public class ForumServiceImpl implements ForumService {
 	@Override
 	public PostDto updatePost(String id, PostUpdateDto postUpdateDto) {
 		Post post = forumRepository.findById(id).orElseThrow(PostNotFoundException::new);
-		post.setContent(postUpdateDto.getContent());
-		post.setTitle(postUpdateDto.getTitle());
-//		post.setTags(postUpdateDto.getTags());
-		post.getTags().addAll(postUpdateDto.getTags());
-		forumRepository.save(post);
+			post.setContent(postUpdateDto.getContent());
+				post.setTitle(postUpdateDto.getTitle());
+					post.getTags().addAll(postUpdateDto.getTags());
+						forumRepository.save(post);
 		return modelMapper.map(post, PostDto.class);
 	}
 

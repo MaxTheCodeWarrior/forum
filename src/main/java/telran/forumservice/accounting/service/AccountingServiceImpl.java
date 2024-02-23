@@ -2,12 +2,14 @@ package telran.forumservice.accounting.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import telran.forumservice.accounting.dao.AccountingRepository;
 import telran.forumservice.accounting.dto.UserCreateDto;
 import telran.forumservice.accounting.dto.UserDto;
+import telran.forumservice.accounting.dto.UserRoleEnum;
 import telran.forumservice.accounting.dto.UserRolesDto;
 import telran.forumservice.accounting.dto.UserUpdateDto;
 import telran.forumservice.accounting.model.User;
@@ -16,7 +18,7 @@ import telran.forumservice.exceptions.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class AccountingServiceImpl implements AccountingService {
+public class AccountingServiceImpl implements AccountingService, CommandLineRunner {
 
 	final AccountingRepository accountRepository;
 	final ModelMapper modelMapper;
@@ -29,7 +31,7 @@ public class AccountingServiceImpl implements AccountingService {
 		User user = modelMapper.map(userCreateDto, User.class);
 		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
 		user.setPassword(password);
-		user.getRoles().add("USER");
+		user.getRoles().add(UserRoleEnum.USER.getValue());
 		accountRepository.save(user);
 		return modelMapper.map(user, UserDto.class);
 	}
@@ -78,6 +80,22 @@ public class AccountingServiceImpl implements AccountingService {
 	public UserDto getUser(String login) {
 		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user, UserDto.class);
+	}
+
+	/* @formatter:off */
+	@Override
+	public void run(String... args) throws Exception {
+		if(!accountRepository.existsById("admin")) {
+			User user = new User();
+				user.setLogin("admin");
+					user.setFirstName("");
+						user.setLastName("");
+							user.setPassword(BCrypt.hashpw("admin", BCrypt.gensalt()));
+								user.getRoles().add(UserRoleEnum.MODERATOR.getValue());
+									user.getRoles().add(UserRoleEnum.ADMINISTRATOR.getValue());
+										accountRepository.save(user);
+		}
+		
 	}
 
 }
