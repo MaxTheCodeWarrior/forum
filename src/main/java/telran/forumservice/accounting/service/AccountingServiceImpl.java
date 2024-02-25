@@ -31,7 +31,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 		User user = modelMapper.map(userCreateDto, User.class);
 		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
 		user.setPassword(password);
-		user.getRoles().add(UserRoleEnum.USER.getValue());
+		user.getRoles().add(UserRoleEnum.USER);
 		accountRepository.save(user);
 		return modelMapper.map(user, UserDto.class);
 	}
@@ -55,7 +55,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 	@Override
 	public UserRolesDto addUserRole(String login, String role) {
 		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
-		user.getRoles().add(role);
+		user.getRoles().add(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
 	}
@@ -63,7 +63,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 	@Override
 	public UserRolesDto deleteUserRole(String login, String role) {
 		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
-		user.getRoles().remove(role);
+		user.getRoles().remove(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
 	}
@@ -91,8 +91,8 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 					user.setFirstName("");
 						user.setLastName("");
 							user.setPassword(BCrypt.hashpw("admin", BCrypt.gensalt()));
-								user.getRoles().add(UserRoleEnum.MODERATOR.getValue());
-									user.getRoles().add(UserRoleEnum.ADMINISTRATOR.getValue());
+								user.getRoles().add(UserRoleEnum.MODERATOR);
+									user.getRoles().add(UserRoleEnum.ADMINISTRATOR);
 										accountRepository.save(user);
 		}
 		
