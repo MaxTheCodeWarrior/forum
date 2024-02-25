@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import telran.forumservice.accounting.dto.UserRoleEnum;
 
 @Getter
 @NoArgsConstructor
@@ -23,5 +24,5 @@ public class User {
 
 	String lastName;
 
-	Set<String> roles = new HashSet<>();
+	Set<UserRoleEnum> roles = new HashSet<>();
 }

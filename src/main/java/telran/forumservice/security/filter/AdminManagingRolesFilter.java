@@ -34,7 +34,7 @@ public class AdminManagingRolesFilter implements Filter {
 		
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
-			if(!user.getRoles().contains(UserRoleEnum.ADMINISTRATOR.getValue())) {
+			if(!user.getRoles().contains(UserRoleEnum.ADMINISTRATOR)) {
 				response.sendError(403, "Permission denied");
 				return;
 			}

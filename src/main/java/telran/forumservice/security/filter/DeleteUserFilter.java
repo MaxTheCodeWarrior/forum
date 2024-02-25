@@ -38,7 +38,7 @@ public class DeleteUserFilter implements Filter {
 			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
 			String[] pathParts = request.getServletPath().split("/");
 
-			if (!(user.getRoles().contains(UserRoleEnum.ADMINISTRATOR.getValue()) 
+			if (!(user.getRoles().contains(UserRoleEnum.ADMINISTRATOR) 
 					|| Arrays.asList(pathParts).contains(user.getLogin()))) {
 				response.sendError(403, "Permission denied");
 				return;

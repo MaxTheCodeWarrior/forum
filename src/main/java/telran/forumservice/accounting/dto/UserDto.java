@@ -18,6 +18,6 @@ public class UserDto {
 
 	String lastName;
 
-	Set<String> roles = new HashSet<>();
+	Set<UserRoleEnum> roles = new HashSet<>();
 
 }

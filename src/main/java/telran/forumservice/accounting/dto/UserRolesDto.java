@@ -19,6 +19,6 @@ public class UserRolesDto {
 	String login;
 	
 	@Singular
-	Set<String> roles;
+	Set<UserRoleEnum> roles;
 
 }
