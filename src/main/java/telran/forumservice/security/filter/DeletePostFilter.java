@@ -54,6 +54,7 @@ public class DeletePostFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		return HttpMethod.DELETE.matches(method) && path.startsWith("/forum/post/");
+		return HttpMethod.DELETE.matches(method) && path.matches("/forum/post/\\w+");
+
 	}
 }

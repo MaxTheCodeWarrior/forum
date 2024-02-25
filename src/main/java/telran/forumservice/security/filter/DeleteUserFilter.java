@@ -46,7 +46,6 @@ public class DeleteUserFilter implements Filter {
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-
-		return HttpMethod.DELETE.matches(method) && path.startsWith("/account/user/");
+		return HttpMethod.DELETE.matches(method) && path.matches("/account/user/\\w+");
 	}
 }
