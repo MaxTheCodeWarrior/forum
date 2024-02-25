@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import telran.forumservice.accounting.model.User;
+import telran.forumservice.accounting.model.UserAccount;
 
-public interface AccountingRepository extends CrudRepository<User, String> {
+public interface AccountingRepository extends CrudRepository<UserAccount, String> {
 
-	Optional<User> findByLogin(String login);
+	Optional<UserAccount> findByLogin(String login);
 
 }

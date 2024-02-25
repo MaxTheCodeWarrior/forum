@@ -13,7 +13,7 @@ import telran.forumservice.accounting.dto.UserRoleEnum;
 @Getter
 @NoArgsConstructor
 @Setter
-public class User {
+public class UserAccount {
 
 	@Id
 	String login;

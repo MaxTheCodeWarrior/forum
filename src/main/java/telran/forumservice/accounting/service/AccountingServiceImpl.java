@@ -12,7 +12,7 @@ import telran.forumservice.accounting.dto.UserDto;
 import telran.forumservice.accounting.dto.UserRoleEnum;
 import telran.forumservice.accounting.dto.UserRolesDto;
 import telran.forumservice.accounting.dto.UserUpdateDto;
-import telran.forumservice.accounting.model.User;
+import telran.forumservice.accounting.model.UserAccount;
 import telran.forumservice.exceptions.UserExistsException;
 import telran.forumservice.exceptions.UserNotFoundException;
 
@@ -28,7 +28,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 		if (accountRepository.existsById(userCreateDto.getLogin())) {
 			throw new UserExistsException();
 		}
-		User user = modelMapper.map(userCreateDto, User.class);
+		UserAccount user = modelMapper.map(userCreateDto, UserAccount.class);
 		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
 		user.setPassword(password);
 		user.getRoles().add(UserRoleEnum.USER);
@@ -38,14 +38,14 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserDto deleteUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		accountRepository.delete(user);
 		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public UserDto updateUser(String login, UserUpdateDto userUppdateDto) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.setFirstName(userUppdateDto.getFirstName());
 		user.setLastName(userUppdateDto.getLastName());
 		accountRepository.save(user);
@@ -54,7 +54,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserRolesDto addUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().add(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -62,7 +62,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserRolesDto deleteUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().remove(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -70,7 +70,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public void changeUserPassword(String login, String newPassword) {
-		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
 		user.setPassword(password);
 		accountRepository.save(user);
@@ -78,7 +78,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserDto getUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		UserAccount user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user, UserDto.class);
 	}
 
@@ -86,7 +86,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 	@Override
 	public void run(String... args) throws Exception {
 		if(!accountRepository.existsById("admin")) {
-			User user = new User();
+			UserAccount user = new UserAccount();
 				user.setLogin("admin");
 					user.setFirstName("");
 						user.setLastName("");

@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.forumservice.accounting.dao.AccountingRepository;
-import telran.forumservice.accounting.model.User;
+import telran.forumservice.accounting.model.UserAccount;
 
 
 
@@ -35,7 +35,7 @@ public class AddComentFilter implements Filter {
 
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 
-			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
+			UserAccount user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
 			String[] pathParts = request.getServletPath().split("/");
 
 			if (! Arrays.asList(pathParts).contains(user.getLogin())) {

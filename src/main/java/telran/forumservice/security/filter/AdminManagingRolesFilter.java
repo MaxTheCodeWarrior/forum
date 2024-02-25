@@ -12,40 +12,33 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import telran.forumservice.accounting.dao.AccountingRepository;
 import telran.forumservice.accounting.dto.UserRoleEnum;
-import telran.forumservice.accounting.model.User;
+import telran.forumservice.security.model.User;
 
-@RequiredArgsConstructor
 @Component
 @Order(20)
 public class AdminManagingRolesFilter implements Filter {
-	
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
-		
+
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 
-		
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
-			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
-			if(!user.getRoles().contains(UserRoleEnum.ADMINISTRATOR)) {
+			User user = (User) request.getUserPrincipal();
+			if (!user.getRoles().contains(UserRoleEnum.ADMINISTRATOR.getValue())) {
 				response.sendError(403, "Permission denied");
 				return;
 			}
 		}
-	
+
 		chain.doFilter(request, response);
-		
+
 	}
 
 	private boolean checkEndPoint(String method, String path) {
-		
 		return path.matches("/account/user/\\w+/role/\\w+");
 	}
 

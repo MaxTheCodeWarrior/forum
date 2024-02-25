@@ -1,7 +1,6 @@
 package telran.forumservice.security.filter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -15,16 +14,13 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.forumservice.accounting.dao.AccountingRepository;
 import telran.forumservice.accounting.dto.UserRoleEnum;
-import telran.forumservice.accounting.model.User;
+import telran.forumservice.security.model.User;
 
 @RequiredArgsConstructor
 @Component
 @Order(40)
 public class DeleteUserFilter implements Filter {
-
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -35,11 +31,11 @@ public class DeleteUserFilter implements Filter {
 
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
 
-			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
+			User user = (User) request.getUserPrincipal();
 			String[] pathParts = request.getServletPath().split("/");
 
-			if (!(user.getRoles().contains(UserRoleEnum.ADMINISTRATOR) 
-					|| Arrays.asList(pathParts).contains(user.getLogin()))) {
+			if (!(user.getRoles().contains(UserRoleEnum.ADMINISTRATOR.getValue())
+					|| user.getName().equals(pathParts[pathParts.length - 1]))) {
 				response.sendError(403, "Permission denied");
 				return;
 			}

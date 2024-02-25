@@ -1,7 +1,6 @@
 package telran.forumservice.security.filter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -15,19 +14,17 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.forumservice.accounting.dao.AccountingRepository;
 import telran.forumservice.accounting.dto.UserRoleEnum;
-import telran.forumservice.accounting.model.User;
-
-
+import telran.forumservice.dao.ForumRepository;
+import telran.forumservice.model.Post;
+import telran.forumservice.security.model.User;
 
 @RequiredArgsConstructor
 @Component
 @Order(50)
 public class DeletePostFilter implements Filter {
 
-
-	final AccountingRepository accountingRepository;
+	final ForumRepository forumRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -35,17 +32,22 @@ public class DeletePostFilter implements Filter {
 
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-
 		if (checkEndPoint(request.getMethod(), request.getServletPath())) {
+			User user = (User) request.getUserPrincipal();
 
-			User user = accountingRepository.findById(request.getUserPrincipal().getName()).get();
-			String[] pathParts = request.getServletPath().split("/");
-
-			if (!(user.getRoles().contains(UserRoleEnum.MODERATOR)
-					|| Arrays.asList(pathParts).contains(user.getLogin()))) {
-				response.sendError(403, "Permission denied");
+			String[] arr = request.getServletPath().split("/");
+			String postId = arr[arr.length - 1];
+			Post post = forumRepository.findById(postId).orElse(null);
+			if (post == null) {
+				response.sendError(404);
 				return;
 			}
+			if (!(user.getName().equals(post.getAuthor())
+					|| user.getRoles().contains(UserRoleEnum.MODERATOR.getValue()))) {
+				response.sendError(403);
+				return;
+			}
+
 		}
 
 		chain.doFilter(request, response);
