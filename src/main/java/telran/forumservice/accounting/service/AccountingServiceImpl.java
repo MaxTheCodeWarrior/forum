@@ -1,8 +1,8 @@
 package telran.forumservice.accounting.service;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	final AccountingRepository accountRepository;
 	final ModelMapper modelMapper;
+	final PasswordEncoder passwordEncoder;
 
 	@Override
 	public UserDto registerUser(UserCreateDto userCreateDto) {
@@ -29,7 +30,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 			throw new UserExistsException();
 		}
 		User user = modelMapper.map(userCreateDto, User.class);
-		String password = BCrypt.hashpw(userCreateDto.getPassword(), BCrypt.gensalt());
+		String password = passwordEncoder.encode(userCreateDto.getPassword());
 		user.setPassword(password);
 		user.getRoles().add(UserRoleEnum.USER);
 		accountRepository.save(user);
@@ -38,14 +39,14 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserDto deleteUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		accountRepository.delete(user);
 		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public UserDto updateUser(String login, UserUpdateDto userUppdateDto) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		user.setFirstName(userUppdateDto.getFirstName());
 		user.setLastName(userUppdateDto.getLastName());
 		accountRepository.save(user);
@@ -54,7 +55,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserRolesDto addUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().add(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -62,7 +63,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 
 	@Override
 	public UserRolesDto deleteUserRole(String login, String role) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		user.getRoles().remove(UserRoleEnum.valueOf(role.toUpperCase()));
 		accountRepository.save(user);
 		return modelMapper.map(user, UserRolesDto.class);
@@ -71,18 +72,20 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 	@Override
 	public void changeUserPassword(String login, String newPassword) {
 		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
-		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+		String password = passwordEncoder.encode(newPassword);
 		user.setPassword(password);
 		accountRepository.save(user);
 	}
 
 	@Override
 	public UserDto getUser(String login) {
-		User user = accountRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+		User user = accountRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user, UserDto.class);
 	}
 
 	/* @formatter:off */
+	
+	//CommandLineRunner 
 	@Override
 	public void run(String... args) throws Exception {
 		if(!accountRepository.existsById("admin")) {
@@ -90,7 +93,7 @@ public class AccountingServiceImpl implements AccountingService, CommandLineRunn
 				user.setLogin("admin");
 					user.setFirstName("");
 						user.setLastName("");
-							user.setPassword(BCrypt.hashpw("admin", BCrypt.gensalt()));
+							user.setPassword(passwordEncoder.encode("admin"));
 								user.getRoles().add(UserRoleEnum.MODERATOR);
 									user.getRoles().add(UserRoleEnum.ADMINISTRATOR);
 										accountRepository.save(user);
