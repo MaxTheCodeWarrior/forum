@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import telran.forumservice.dao.ForumRepository;
 import telran.forumservice.model.Post;
 
-@Service("customSecurity")
+@Service
 @RequiredArgsConstructor
 
 public class CustomWebSecurity { 

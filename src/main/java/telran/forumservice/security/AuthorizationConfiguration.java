@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
@@ -23,7 +24,8 @@ public class AuthorizationConfiguration {
 	@Bean
 	public SecurityFilterChain web(HttpSecurity http) throws Exception {
 		http.httpBasic(Customizer.withDefaults());
-		http.csrf(csrf -> csrf.disable()); 
+		http.csrf(csrf -> csrf.disable()); //cross scripting filter
+		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)); //SESSION COOCKIES !!!!
 		http.authorizeHttpRequests(authoraize -> authoraize
 
 				.requestMatchers("/account/register", "/forum/posts/**")
@@ -54,8 +56,7 @@ public class AuthorizationConfiguration {
 				.access((a, o) -> {
 					return customWebSecurity.customCheckBiFunction(a, o, (bar, foo) -> {
 						return new AuthorizationDecision(
-							a.get().getAuthorities().stream()
-								.anyMatch(r -> r.getAuthority().equals("ROLE_" + UserRoleEnum.MODERATOR.name()))
+								o.getRequest().isUserInRole(UserRoleEnum.MODERATOR.name())
 									|| customWebSecurity.checkPostAuthor(bar, foo).isGranted());
 					});
 
